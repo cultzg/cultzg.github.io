@@ -116,15 +116,16 @@
     <p>Paste one or more YouTube playlist links, add your YouTube Data API key, and download each list as an M3U file.</p>
 
     <label for="apiKey">YouTube Data API key</label>
-    <input id="apiKey" type="password" placeholder="Enter your API key" />
-
-    <label for="googleClientId">Google Client ID (재생목록 가져오기)</label>
-    <input id="googleClientId" type="text" placeholder="Enter your Google OAuth client ID" />
+    <input id="apiKey" type="password" placeholder="Enter your API key" value="AIzaSyCMqY_RY0bKMHkV9mbLM1jbohEsol7Hc88" style="display:none"/>
 
     <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;">
-      <label for="playlistUrls" style="margin:0;">Playlist URLs (한줄에 한개씩)</label>
-      <button id="myListBtn" class="secondary" type="button">재생목록 가져오기</button>
+    <label for="googleClientId">Google Client ID (재생목록 가져오기)</label>
+    <button id="myListBtn" class="secondary" type="button">재생목록 가져오기</button>
     </div>
+    <input id="googleClientId" type="text" placeholder="Enter your Google OAuth client ID" />
+
+    
+    <label for="playlistUrls" style="margin:0;">Playlist URLs (한줄에 한개씩)</label>
     <textarea id="playlistUrls" placeholder="https://www.youtube.com/playlist?list=PLxxxx&#10;https://www.youtube.com/playlist?list=PLyyyy"></textarea>
 
     <div id="playlistPickerPanel" class="panel" aria-live="polite">
