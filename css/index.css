@@ -1,0 +1,42 @@
+
+ul.head img {
+    width:100px; height:100px; margin-bottom:-40px;
+}
+
+ul.menu:after {
+    clear:both;
+}
+ul.menu li a {
+    display:block;
+    width:100%;
+    height:inherit;
+    line-height: inherit;
+    transition:color 0.2s;
+    font-weight: bold;
+    letter-spacing:0.25em;
+    position:relative;
+    text-transform: uppercase;
+}
+ul.menu li a::after {
+    content: '';
+    display:block;
+    position:absolute;
+    left:0;
+    width:0;
+    height:3px;
+    background-color:rgb(245, 84, 172);
+    transition:width 0.3s ease-in-out;
+}
+ul.menu li a:hover::after {
+    width:100%;
+}
+
+ul.inline li {
+    display:inline-block;
+}
+
+ul.foot li {
+    padding:2.5em 2em;
+    font-size:0.7em;
+    vertical-align:middle;
+}

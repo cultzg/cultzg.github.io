@@ -1,6 +1,61 @@
-<html>
-<body>
-    <a href="ytpl2m3u.htm">ytpl2m3u</a> - Convert YouTube playlist to M3U playlist<br>
-</body> 
-</html>
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="no-cache">
+<meta http-equiv="Pragma: no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="X-UA-Compatable" content="IE=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>::Oops!</title>
+<link rel="stylesheet" href="css/base.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/jquery.tpl.js?id=time"></script>
+<script>
+const parms = new URLSearchParams(window.location.search);
+const tpl = parms.get('tpl') || 'main';
+const tpls = {
+    head: [{}],
+    menu: [{link:'?tpl=who',text:'Who'},{link:'?tpl=are',text:'are'},{link:'?tpl=you',text:'you'}],
+    side: [{link:'https://www.google.com',text:'사이드 메뉴'}],
+    foot: [{link:'mailto:cultz@kakao.com',text:'@Contact'}]
+};
 
+</script>
+</head>
+<body>
+<header></header>
+<nav><ul id="menu" class="menu"></ul></nav>
+<section></section>
+<aside><ul id="side"></ul></aside>
+<footer><ul id="foot"></ul></footer>
+
+<template name="head" slot="header">
+<ul class="head inline">
+    <li><!--img src="img/logo.png" class="logo"--></li>
+    <li><audio controls hidden><scource src="">지원하지 않는 브라우저입니다.</audio></li>
+</ul>
+</template>
+<template name="menu" slot="#menu">
+    <li><a href="${link}" class="scrolly">${text}</a></li>
+</template>
+<template name="side" slot="#side">
+    <li><a href="${link}">${text}</a></li>
+</template>
+<template name="foot" slot="#foot">
+	<li><a href="${link}">${text}</a></li>
+</template>
+<script>
+$(window).on('load', function(){
+    $('template').tpl_all(tpls);
+
+    const url ='https://jsonplaceholder.typicode.com/posts';
+    $('section').load(url, function(json){
+        $(this).tpl_table(JSON.parse(json));
+    });
+});
+</script>
+</body>
+</html>
