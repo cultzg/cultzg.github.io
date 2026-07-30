@@ -12,12 +12,10 @@
 <title>::Oops!</title>
 <link rel="stylesheet" href="css/base.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="js/jquery.tpl.js?id=time"></script>
+<script src="js/jquery.tpl.js?id=time1dd"></script>
 <script>
 const parms = new URLSearchParams(window.location.search);
-const tpl = parms.get('tpl') || 'main';
-const tpls = {
-    head: [{}],
+const tmpts = {
     menu: [{link:'?tpl=who',text:'Who'},{link:'?tpl=are',text:'are'},{link:'?tpl=you',text:'you'}],
     side: [{link:'https://www.google.com',text:'사이드 메뉴'}],
     foot: [{link:'mailto:cultz@kakao.com',text:'@Contact'}]
@@ -26,34 +24,45 @@ const tpls = {
 </script>
 </head>
 <body>
-<header></header>
+<header>
+    <ul class="head inline">
+        <li><!--img src="img/logo.png" class="logo"--></li>
+        <li><audio controls hidden><scource src="">지원하지 않는 브라우저입니다.</audio></li>
+    </ul>
+</header>
 <nav><ul id="menu" class="menu"></ul></nav>
-<section></section>
+<section>
+    <table id="tab1"></table>
+</section>
 <aside><ul id="side"></ul></aside>
 <footer><ul id="foot"></ul></footer>
 
-<template name="head" slot="header">
-<ul class="head inline">
-    <li><!--img src="img/logo.png" class="logo"--></li>
-    <li><audio controls hidden><scource src="">지원하지 않는 브라우저입니다.</audio></li>
-</ul>
-</template>
 <template name="menu" slot="#menu">
-    <li><a href="${link}" class="scrolly">${text}</a></li>
+    <li><a href="{link}" class="scrolly">{text}</a></li>
 </template>
 <template name="side" slot="#side">
-    <li><a href="${link}">${text}</a></li>
+    <li><a href="{link}">{text}</a></li>
 </template>
 <template name="foot" slot="#foot">
-	<li><a href="${link}">${text}</a></li>
+	<li><a href="{link}">{text}</a></li>
+</template>
+<template name="table" slot="#tab1">
+<tr>
+    <td><a href="{base_url}">{name}</a></td>
+    <td>{auth_type}</td>
+    <td>{category}</td></td>
+</tr>    
 </template>
 <script>
 $(window).on('load', function(){
-    $('template').tpl_all(tpls);
+    $.each(tmpts, function (k,v) {
+        $(`template[name=${k}]`).tpl(v);
+    });
 
-    const url ='https://jsonplaceholder.typicode.com/posts';
-    $('section').load(url, function(json){
-        $(this).tpl_table(JSON.parse(json));
+    const url ='/api';
+    $().load(url, function(json){
+        const rows = JSON.parse(json);
+        $('template[name=table]').tpl_table(rows);
     });
 });
 </script>
