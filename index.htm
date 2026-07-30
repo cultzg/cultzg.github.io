@@ -12,57 +12,35 @@
 <title>::Oops!</title>
 <link rel="stylesheet" href="css/base.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="js/jquery.tpl.js?id=time1dd"></script>
-<script>
-const parms = new URLSearchParams(window.location.search);
-const tmpts = {
-    menu: [{link:'?tpl=who',text:'Who'},{link:'?tpl=are',text:'are'},{link:'?tpl=you',text:'you'}],
-    side: [{link:'https://www.google.com',text:'사이드 메뉴'}],
-    foot: [{link:'mailto:cultz@kakao.com',text:'@Contact'}]
-};
-
-</script>
+<script src="js/jquery.tpl.js?"></script>
 </head>
 <body>
-<header>
-    <ul class="head inline">
-        <li><!--img src="img/logo.png" class="logo"--></li>
-        <li><audio controls hidden><scource src="">지원하지 않는 브라우저입니다.</audio></li>
-    </ul>
-</header>
-<nav><ul id="menu" class="menu"></ul></nav>
-<section>
-    <table id="tab1"></table>
-</section>
-<aside><ul id="side"></ul></aside>
-<footer><ul id="foot"></ul></footer>
-
-<template name="menu" slot="#menu">
-    <li><a href="{link}" class="scrolly">{text}</a></li>
-</template>
-<template name="side" slot="#side">
-    <li><a href="{link}">{text}</a></li>
-</template>
-<template name="foot" slot="#foot">
-	<li><a href="{link}">{text}</a></li>
-</template>
-<template name="table" slot="#tab1">
-<tr>
-    <td><a href="{base_url}">{name}</a></td>
-    <td>{auth_type}</td>
-    <td>{category}</td></td>
-</tr>    
-</template>
+<header id="head"></header>
+<nav id="menu" class="menu"></nav>
+<section></section>
+<aside id="side"></aside>
+<footer id="foot"></footer>
+<template name="head" slot="#head"></template>
+<template name="menu" slot="#menu"></template>
+<template name="side" slot="#side"></template>
+<template name="foot" slot="#foot"></template>
 <script>
 $(window).on('load', function(){
-    $.each(tmpts, function (k,v) {
-        $(`template[name=${k}]`).tpl(v);
+    const tmpts = {
+        head: [{link1:"<!--img src='img/logo.png'>", link2:"<audio controls hidden><scource src=''>지원하지 않는 브라우저입니다.</audio>"}],
+        menu: [{menu1:"<a href='?menu=1'>Menu1</a>",menu2:"Menu2",menu3:"Menu3"}],
+        side: [{menu1:"<a href='/'>사이드 메뉴</a>"}],
+        foot: [{link1:"<a href='mailto:cultz@kakao.com'>@Contact</a>"}]
+    };
+    $.each(tmpts, function (key,val) {
+        $(`template[name=${key}]`).tpl(val,'ul');
     });
 
-    const url ='/api';
-    $().load(url, function(json){
+    const url ='https://jsonplaceholder.typicode.com/posts';
+    //const url = '/api'
+    $(window).load(url, function(json){
         const rows = JSON.parse(json);
-        $('template[name=table]').tpl_table(rows);
+        $('section').tpl(rows,'table');
     });
 });
 </script>
