@@ -16,31 +16,26 @@
 </head>
 <body>
 <header id="head"></header>
-<nav id="menu" class="menu"></nav>
+<nav id="menu"></nav>
 <section></section>
 <aside id="side"></aside>
 <footer id="foot"></footer>
-<template name="head" slot="#head"></template>
-<template name="menu" slot="#menu"></template>
-<template name="side" slot="#side"></template>
-<template name="foot" slot="#foot"></template>
 <script>
 $(window).on('load', function(){
     const tmpts = {
         head: [{link1:"<!--img src='img/logo.png'>", link2:"<audio controls hidden><scource src=''>지원하지 않는 브라우저입니다.</audio>"}],
-        menu: [{menu1:"<a href='?menu=1'>Menu1</a>",menu2:"Menu2",menu3:"Menu3"}],
-        side: [{menu1:"<a href='/'>사이드 메뉴</a>"}],
-        foot: [{link1:"<a href='mailto:cultz@kakao.com'>@Contact</a>"}]
+        menu: [{menu1:"<a href='/api'>API</a>",menu2:"<a href=''>Data</a>",menu3:"Menu3"}],
+        side: [{menu1:"<a href='/'>Side</a>",menu2:"<a href=''>xxx</a>"}],
+        foot: [{link1:"<a href='mailto:cultz@kakao.com'>@Contact</a>",link2:"<a href=''>cc</a>"}]
     };
     $.each(tmpts, function (key,val) {
-        $(`template[name=${key}]`).tpl(val,'ul');
+        $(`#${key}`).tpl(val,'ul');
     });
 
     const url ='https://jsonplaceholder.typicode.com/posts';
     //const url = '/api'
     $(window).load(url, function(json){
-        const rows = JSON.parse(json);
-        $('section').tpl(rows,'table');
+        $('section').tpl(JSON.parse(json),'table');
     });
 });
 </script>
