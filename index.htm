@@ -16,27 +16,44 @@
 </head>
 <body>
 <header id="head"></header>
-<nav id="menu"></nav>
+<nav id="menu">
+    <li><a href="{link}">{name}</a></li>
+</nav>
 <section></section>
 <aside id="side"></aside>
 <footer id="foot"></footer>
 <script>
-$(window).on('load', function(){
-    const tmpts = {
-        head: [{link1:"<!--img src='img/logo.png'>", link2:"<audio controls hidden><scource src=''>지원하지 않는 브라우저입니다.</audio>"}],
-        menu: [{menu1:"<a href='/api'>API</a>",menu2:"<a href=''>Data</a>",menu3:"Menu3"}],
-        side: [{menu1:"<a href='/'>Side</a>",menu2:"<a href=''>xxx</a>"}],
-        foot: [{link1:"<a href='mailto:cultz@kakao.com'>@Contact</a>",link2:"<a href=''>cc</a>"}]
-    };
-    $.each(tmpts, function (key,val) {
-        $(`#${key}`).tpl(val,'ul');
-    });
+$(document).ready(function(){
 
     const url ='https://jsonplaceholder.typicode.com/posts';
-    //const url = '/api'
-    $(window).load(url, function(json){
-        $('section').tpl(JSON.parse(json),'table');
-    });
+    //$(window).load(url, function(json){
+        //$('section').tpl(JSON.parse(json),'table');
+    //});
+
+    const tmpls = {
+        menu : [{
+                name:'인공지능',
+                link:'/ai'
+            },{
+                name:'미디어',
+                link:'/media'
+            },{
+                name:'정보캐기',
+                link:'/info'
+            }
+        ],
+        foot: [{
+            link1: '<a href="">Link1</a>',
+            link2: '<a href="">Link2</a>'
+        }]
+    }
+
+    $('#menu').tpl(tmpls.menu);
+    $('#side').tpl(tmpls.menu, '<table>');
+    $('#foot').tpl(tmpls.foot, '<ul>');
+    
+
+    //$('footer').tpl.table(tmpls.menu);
 });
 </script>
 </body>

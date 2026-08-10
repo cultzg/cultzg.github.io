@@ -1,43 +1,32 @@
-!function($){
-    $.fn.tpl = function(data={}, type='tpl') {
-        $(this).each(function(i, el){
-            let slot = $(el).attr('slot') ? $(el).attr('slot') : this;
-            let html = $(this).html()||'';
-            if(Array.isArray(data)) {
-                if(type==='table') {
-                    html = $(this).tpl.table(data);
-                } else if(type==='ul') {
-                    html = $(this).tpl.ul(data);
-                } else {
-                    html = $(this).tpl.rows(data);
-                }
-            } else {
-                html = $(this).tpl.row(data);
-            }
-            return $(slot).html(html);
-        });
+(function($){
+
+    $.fn.tpl = function(rows=[], tag='<ul>') {
+        let $el = $(this);
+        let tmpl = $el.html();
+        if(tag==='<table>')     {
+            tmpl = $().tpl.table(rows, tmpl);
+        } else if(tag==='<ul>') {
+            tmpl = $().tpl.rows(rows, tmpl||'<li>{_val}</li>');
+        } else {
+            tmpl = $().tpl.rows(rows, tmpl||'<div>');
+        }                   
+        $el.html($(tag).append(tmpl));
     }
-    $.fn.tpl.row = function(row){ //{$key}=>val로 변경 1차원 객체처리
-        let html = $(this).html()||'';
-        Object.keys(row).map(key => html=html.replaceAll(`{${key}}`, row[key])).join('');
-        return html;
+
+    $.fn.tpl.rows = function(rows, html){ //2차원 객체 배열처리
+        return rows.map(row => $().tpl.row(row, html)).join('');
     }
-    $.fn.tpl.rows = function(rows){ //2차원 객체 배열처리
-        return rows.map(row => $(this).tpl.row(row)).join('');
+    $.fn.tpl.row = function(row, html){ //{$key}=>val로 변경 1차원 객체처리
+        return $().tpl.replace(row, html);
     }
-    $.fn.tpl.li = function(row) {
-        return '<ul>'+Object.keys(row).map(key => '<li>{_val}</li>'.replace(`{_val}`, row[key])).join('');
+    $.fn.tpl.replace = function(row, str) {
+        if( str.includes("{_key}") ) return Object.keys(row).map(key => str.replace(`{_key}`, key)).join('');
+        if( str.includes("{_val}") ) return Object.keys(row).map(key => str.replace(`{_val}`, row[key])).join('');
+        return Object.keys(row).reduce((acc, cur) => acc.replaceAll(`{${cur}}`, row[cur]), str);
     }
-    $.fn.tpl.ul = function(rows) {
-        return rows.map(row => $(this).tpl.li(row)).join('</ul>');
+    $.fn.tpl.table = function(rows, str='<td>{_val}</td>') {
+        const th = '<tr>'+$().tpl.replace(rows[0], '<th>{_key}</th>');
+        const tr = rows.map(row => '<tr>'+$().tpl.replace(row, str)).join('');
+        return th + tr; 
     }
-    $.fn.tpl.th = function(row) {
-        return '<tr>'+Object.keys(row).map(key => '<th>{_key}</th>'.replace(`{_key}`, key)).join('');
-    }
-    $.fn.tpl.td = function(row) {
-        return '<tr>'+Object.keys(row).map(key => '<td>{_val}</td>'.replace(`{_val}`, row[key])).join('');
-    }
-    $.fn.tpl.table = function(rows) {
-        return '<table>'+ $(this).tpl.th(rows[0]) + rows.map(row => $(this).tpl.td(row)).join(''); 
-    }
-}(jQuery);
+}(jQuery));
