@@ -12,58 +12,48 @@
 <title>::Oops!</title>
 <link rel="stylesheet" href="css/base.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="js/jquery.tpl.js?id=time1dd"></script>
-<script>
-const parms = new URLSearchParams(window.location.search);
-const tmpts = {
-    menu: [{link:'?tpl=who',text:'Who'},{link:'?tpl=are',text:'are'},{link:'?tpl=you',text:'you'}],
-    side: [{link:'https://www.google.com',text:'사이드 메뉴'}],
-    foot: [{link:'mailto:cultz@kakao.com',text:'@Contact'}]
-};
-
-</script>
+<script src="js/jquery.tpl.js?"></script>
 </head>
 <body>
-<header>
-    <ul class="head inline">
-        <li><!--img src="img/logo.png" class="logo"--></li>
-        <li><audio controls hidden><scource src="">지원하지 않는 브라우저입니다.</audio></li>
-    </ul>
-</header>
-<nav><ul id="menu" class="menu"></ul></nav>
-<section>
-    <table id="tab1"></table>
-</section>
-<aside><ul id="side"></ul></aside>
-<footer><ul id="foot"></ul></footer>
-
-<template name="menu" slot="#menu">
-    <li><a href="{link}" class="scrolly">{text}</a></li>
-</template>
-<template name="side" slot="#side">
-    <li><a href="{link}">{text}</a></li>
-</template>
-<template name="foot" slot="#foot">
-	<li><a href="{link}">{text}</a></li>
-</template>
-<template name="table" slot="#tab1">
-<tr>
-    <td><a href="{base_url}">{name}</a></td>
-    <td>{auth_type}</td>
-    <td>{category}</td></td>
-</tr>    
-</template>
+<header id="head"></header>
+<nav id="menu">
+    <li><a href="{link}">{name}</a></li>
+</nav>
+<section></section>
+<aside id="side"></aside>
+<footer id="foot"></footer>
 <script>
-$(window).on('load', function(){
-    $.each(tmpts, function (k,v) {
-        $(`template[name=${k}]`).tpl(v);
-    });
+$(document).ready(function(){
 
-    const url ='/api';
-    $().load(url, function(json){
-        const rows = JSON.parse(json);
-        $('template[name=table]').tpl_table(rows);
-    });
+    const url ='https://jsonplaceholder.typicode.com/posts';
+    //$(window).load(url, function(json){
+        //$('section').tpl(JSON.parse(json),'table');
+    //});
+
+    const tmpls = {
+        menu : [{
+                name:'인공지능',
+                link:'/ai'
+            },{
+                name:'미디어',
+                link:'/media'
+            },{
+                name:'정보캐기',
+                link:'/info'
+            }
+        ],
+        foot: [{
+            link1: '<a href="">Link1</a>',
+            link2: '<a href="">Link2</a>'
+        }]
+    }
+
+    $('#menu').tpl(tmpls.menu);
+    $('#side').tpl(tmpls.menu, '<table>');
+    $('#foot').tpl(tmpls.foot, '<ul>');
+    
+
+    //$('footer').tpl.table(tmpls.menu);
 });
 </script>
 </body>

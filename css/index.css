@@ -1,12 +1,7 @@
-
-ul.head img {
-    width:100px; height:100px; margin-bottom:-40px;
-}
-
-ul.menu:after {
+.menu:after {
     clear:both;
 }
-ul.menu li a {
+.menu li a {
     display:block;
     width:100%;
     height:inherit;
@@ -17,7 +12,7 @@ ul.menu li a {
     position:relative;
     text-transform: uppercase;
 }
-ul.menu li a::after {
+.menu li a::after {
     content: '';
     display:block;
     position:absolute;
@@ -27,7 +22,7 @@ ul.menu li a::after {
     background-color:rgb(245, 84, 172);
     transition:width 0.3s ease-in-out;
 }
-ul.menu li a:hover::after {
+.menu li a:hover::after {
     width:100%;
 }
 
@@ -35,7 +30,7 @@ ul.inline li {
     display:inline-block;
 }
 
-ul.foot li {
+.foot li {
     padding:2.5em 2em;
     font-size:0.7em;
     vertical-align:middle;
