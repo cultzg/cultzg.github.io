@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>자동 생성 폼</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .field { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; }
+    input, select, textarea { width: 280px; padding: 8px; box-sizing: border-box; }
+    .result { margin-top: 16px; padding: 12px; background: #f7f7f7; border: 1px solid #ddd; white-space: pre-wrap; }
+    button { padding: 8px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<h2>데이터 입력 폼</h2>
+<form id="dynamicForm">
+  <div id="fields"></div>
+  <div class="field">
+    <button type="submit">저장</button>
+  </div>
+</form>
+<div id="result" class="result">폼을 불러오는 중입니다...</div>
+
+<script>
+  $(function () {
+    const $fields = $('#fields');
+    const $result = $('#result');
+
+    function getInputType(col) {
+      const type = (col.type || '').toUpperCase();
+      if (['INT','BIGINT','DECIMAL','FLOAT','DOUBLE'].includes(type)) return 'number';
+      if (['DATE','TIME'].includes(type)) return 'datetime-local';
+      if (['BOOL'].includes(type)) return 'checkbox';
+      return 'text';
+    }
+
+    function createField(col) {
+      const isAI = Boolean(col.ai);
+      const isPK = Boolean(col.pk || col.primaryKey);
+      const isNN = col.notnull && !isAI && !isPK;
+      const type = getInputType(col);
+
+      const $wrap = $('<div class="field"></div>');
+      const $label = $('<label></label>').text(`${col.name}  ${isNN ? '*' : ''}`);
+      const $helper = $('<div class="helper"></div>');
+
+      let $input;
+      if (type === 'checkbox') {
+        $input = $('<input type="checkbox">').prop('checked', col.default ? true : false);
+      } else if (type === 'datetime-local') {
+        $input = $('<input type="datetime-local">');
+      } else {
+        $input = $('<input>').attr('type', type);
+      }
+
+      $input.attr('name', col.name);
+      $input.attr('id', 'field-' + col.name);
+      if (isNN) $input.attr('required', 'required');
+      if (isAI || isPK) $input.attr('disabled', 'disabled');
+      if (col.default !== null && col.default !== undefined && col.default !== '' && type !== 'checked') $input.val(col.default);
+      if (col.value !== null) $input.val(col.value); //수정모드일때 값이 있음
+
+      return $wrap.append($label).append($input);
+    }
+
+    $.getJSON('/whois/form', function (cols) {
+      $fields.empty();
+      if (!Array.isArray(cols) || cols.length === 0) {
+        $result.text('표시할 컬럼 정보가 없습니다.'); return;
+      }
+      cols.forEach(function (col) {
+        $fields.append(createField(col));
+      });
+      $result.text('폼을 생성했습니다.');
+    }).fail(function () {
+      $result.text('컬럼 정보를 불러오지 못했습니다.');
+    });
+
+    $('#dynamicForm').on('submit', function (e) {
+      e.preventDefault();
+      const formData = {};
+      $(this).serializeArray().forEach(function (item) {
+        formData[item.name] = item.value;
+      });
+
+      $('input[type="checkbox"]', this).each(function () {
+        formData[$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
+      });
+      $result.text('저장 요청 중...');
+
+      $.ajax({url: '/api',
+        type: 'POST'||'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function (response) {
+          $result.text('저장 성공: ' + JSON.stringify(response, null, 2));
+        },
+        error: function (xhr) {
+          const msg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : '저장 실패';
+          $result.text(msg);
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
