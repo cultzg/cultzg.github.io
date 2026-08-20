@@ -1,0 +1,206 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    /* --- CSS Styling --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .chat-container {
+        width: 100%;
+        max-width: 800px;
+        background: #111;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 85vh;
+        /* 적당한 높이 설정 */
+    }
+
+    #chat-box {
+        padding: 20px;
+        overflow-y: auto;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        white-space: pre-line;
+        /* 메시지 간격 */
+    }
+
+    .message {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 20px;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    /* 사용자 메시지 스타일 */
+    .user {
+        align-self: flex-end;
+        background-color: #007bff;
+        /* 파란색 계열 */
+        color: white;
+        border-bottom-right-radius: 5px;
+        margin-left: auto;
+        /* 오른쪽 정렬 유도 */
+    }
+
+    /* AI 응답 메시지 스타일 */
+    .ai {
+        align-self: flex-start;
+        background-color: #e9ecef;
+        /* 연한 회색 계열 */
+        color: #333;
+        border-bottom-left-radius: 5px;
+    }
+
+    /* 입력 영역 (Footer) 스타일 */
+    .input-area {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #ddd;
+        background-color: #111;
+        border-radius: 12px;
+    }
+
+    #message {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        font-size: 16px;
+        margin-right: 10px;
+        min-height: 40px;
+        overflow-y: hidden;
+        resize: none;
+        box-sizing: border-box;
+    }
+
+    #send-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #send-btn:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    #send-btn:disabled {
+        background-color: #9cc;
+        cursor: not-allowed;
+    }
+</style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="chat-container"> <!-- 챗 메시지가 여기에 표시됩니다. -->
+    <div id="chat-box">
+        <div class="message ai"> 안녕하세요! 저는 땡칠이 봇입니다. 무엇이 궁금하신가요?</div>
+    </div> <!-- 사용자 입력 및 전송 버튼 영역 -->
+    <div class="input-area">
+        <input type="text" id="message" placeholder="메시지를 입력하세요..." autofocus> 
+        <button id="send-btn" onclick="chat()">전송</button> </div>
+</div>
+<script>
+// 전역 변수: 대화 기록을 저장하여 맥락(Context)을 유지합니다. (필수!) 
+const model = 'exaone3.5';//['exaone3.5','gemma4','phi4-mini']; 
+const api_url = 'http://localhost:3000/ai/chat';
+
+$('#message').on('keydown', function(evt){
+    if(evt.key === 'Enter' && !evt.shiftKey) {
+        evt.preventDefault();
+        chat();
+    }
+    this.style.height = this.scrollHeight;
+    //evt.target.style.height = `${evt.target.scrollHeight}px`
+});
+
+$.fn.appendMessage = function(message, sender='user'||'ai') {
+    const el = $('<div></div>').addClass(`message ${sender}`).text(message);
+    this.append(el);
+    this.scrollTop = this.scrollHeight;
+    return this;
+}
+
+function chat() {
+    const message = $('#message').val();
+    if (message==='') return;
+    $('#chat-box').appendMessage(message, 'user'); 
+    $('#message').val('') // 입력창 비우기 
+    setLoadingState(true);
+    chatHistory.push({ role: 'user', content: message });//대화 기록에 사용자 메시지 추가 
+
+    fetch_api(api_url, {
+        model: model, // 사용할 모델 이름 (예: llama3, gemma 등)
+        messages: chatHistory,
+        stream: true    // 스트리밍 활성화
+    });
+}
+
+function setLoadingState(isLoading) { 
+    $('#message').disabled = isLoading; 
+    $('#send-btn').disabled = isLoading; 
+    if (isLoading) { 
+        $('#chat-box').appendMessage("🤖 답변을 생성하는 중...", 'ai'); 
+    } else { 
+        // 로딩이 끝나면 임시로 추가된 더미 메시지를 삭제할 수 있습니다. 
+        // // 여기서는 간단히 처리하고 넘어갑니다. 
+    } 
+} 
+async function fetch_api(url, data) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    try {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        $( "#chat-box").children().last().text('');
+        let fullText = [];
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            // 받은 바이너리 데이터를 텍스트로 변환
+            const chunk = decoder.decode(value, { stream: true });
+            const json = JSON.parse(chunk);
+            const content = json.message.content;//.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            fullText.push(content);
+            $('#chat-box').children().last().append(content);
+            $('#chat-box').scrollTop = $('#chat-box').scrollHeight;
+
+        }
+        chatHistory.push({ role: 'assistant', content: fullText.join('') });
+
+    } catch(err) {
+        console.error('API 호출 중 오류 발생:', err);
+        $('#chat-box').children().last().text("🤖 오류..."); 
+        setLoadingState(false);
+
+    } finally {
+        setLoadingState(false);
+    }
+}
+</script>
+</body>
+</html>

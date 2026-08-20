@@ -3,7 +3,7 @@
         var html = '';
         const tmpl = $(this).html();
         const slot = $(this).prop('slot')||this;
-        console.log(tmpl);
+        //console.log(tmpl);
         
         if(tag==='table')     {
             let th = '';//'<tr>'+$().tpl.row(rows[0], tmpl||'<th>{_key}</th>');
@@ -13,8 +13,8 @@
             let child = $().tpl.rows(rows, tmpl||'<li>{_val}</li>');
             html = $(`<${tag}>`).append(child);
         }                  
-        $(slot).html(html);
-        return this;
+        return $(slot).html(html);
+        //return this;
     }
     $.fn.tpl.rows = function(rows, html, pre=''){ //2차원 객체 배열처리
         return rows.map(row => pre+$().tpl.row(row, html)).join('');
