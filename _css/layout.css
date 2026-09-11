@@ -1,9 +1,8 @@
+/** common */
 html {
-    font-size: 15pt;
     box-sizing: border-box;
-}
-*, *:before, *:after {
-	box-sizing: inherit;
+    scrollbar-gutter: stable;
+    /**overflow-y: scroll;**/
 }
 a {
     text-decoration:none;
@@ -11,18 +10,34 @@ a {
 ul,li,ol,dl,dt,dd {
 	list-style: none;
 }
-body, header, nav, main, section, article, aside, details, figcaption, figure, footer, hgroup,dl,dt,dd,ol,ul,li {
+header, nav, main, section, article, aside, details, figcaption, figure, footer, hgroup,dl,dt,dd,ol,ul,li {
 	display:block; margin:0 auto; padding:0; border:0;
 }
-/** Layout */
-header, footer, nav{
-    height:3em;
-    background-color:royalblue;
+*, *:before, *:after {
+	box-sizing: inherit;
 }
-section, aside{
+
+/** Layout */
+header {
+    width:100%;
+}
+main {
+    width:100%;
+}
+section {
+    width: 100%; 
+    min-width: 800px;
+    min-height: 500px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+nav, section, aside, footer {
     padding:1em;
 }
-footer{
+footer {
     clear:both;
     text-align:center;
 }
@@ -31,19 +46,19 @@ footer{
 	width: device-width;
 }
 @media screen and (max-width: 480px) {/** 모바일 세로 */
-    html {font-size: 14pt;}
+    body {font-size: 14pt;}
 }
 @media screen and (max-width: 736px) {/** 모바일 가로, 타블렛 세로 */
-    nav ul{max-width:100%}
+
 }
 @media screen and (max-width: 1024px) {/** 타블렛 가로, 노트북 */
     header {display:none;}
 }
 @media screen and (max-width: 1280px) {/** 타블렛 가로, 노트북 */
-    nav {height:3em;}
+    nav {
+        width:100%;
+    }
     nav ul{
-        max-width:80%;
-        height:inherit;
         display:flex;
         align-items:center;
     }
@@ -51,9 +66,22 @@ footer{
 }
 @media screen and (min-width: 1281px) {
     /** 타블렛 가로, 노트북 */
+    header {
+        padding:0 20%;
+    }
     nav {
-        width:20%; height:90vh;
+        width:20%;
         float:left;
+    }
+    nav ul {
+        width:80%;
+        flex-direction:column;
+    }
+    nav li {
+        width:100%;
+        height:3em;
+        line-height:3em;
+        text-align:right;
     }
     section {
         width:65%;
@@ -63,15 +91,7 @@ footer{
         width:15%;
         float:right;
     }
-    nav#menu ul {
-        width:80%;
-        display:flex;
-        flex-direction:column;
-    }
-    nav#menu li {
-        width:100%;
-        height:3em;
-        line-height:3em;
-        text-align:right;
+    aside li {
+        line-height:1.5em;
     }
 }

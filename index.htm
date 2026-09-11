@@ -1,10 +1,32 @@
-<!--#include file="head.htm" -->
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="no-cache">
+<meta http-equiv="Pragma: no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="X-UA-Compatable" content="IE=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>::Oops!</title>
+<link rel="stylesheet" href="_css/index.css">
+<link rel="stylesheet" href="_css/layout.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="_js/jquery.template.js?"></script>
+</head>
 <body>
-<header id="head"></header>
-<nav id="menu"><li><a href="{link}">{name}</a></li></nav>
+<header><h1><a href="/">HOME</a></h1></header>
+<main>
+<nav class="menu">
+    <li><a href="#" onclick="loadContent('{link}')"">{name}</a></li>
+</nav>
 <section></section>
-<aside id="side"></aside>
-<footer id="foot"></footer>
+<aside class="side">
+    <li><a href='{link}' target=_blank>{name}</a></li>
+</aside>
+</main>
+<footer></footer>
 <template id="tmpl_section" slot="section">
 <tr>
     <td>{id}</td>
@@ -13,34 +35,37 @@
 </tr>
 </template>
 <script>
-$(document).ready(function(){
-    const tmpls = {
-        menu : [{
-                name:'인공지능',
-                link:'/ai'
-            },{
-                name:'미디어',
-                link:'/media'
-            },{
-                name:'정보캐기',
-                link:'/info'
-            }
-        ],
-        foot: [{
-            link1: '<a href="">Link1</a>',
-            link2: '<a href="">Link2</a>'
-        }]
-    }
-    
-    $('#menu').tpl(tmpls.menu);
-    $('#side').tpl(tmpls.menu, 'table');
-    $('#foot').tpl(tmpls.foot);
+const API = 'http://localhost:3000';//http://cultz.duckdns.org/api
 
-    const url ='https://jsonplaceholder.typicode.com/posts';
-    $.get(url, function(rows){
-        $('#tmpl_section').tpl(rows,'table');
+
+function loadContent(path='/main') {
+    const param = new URLSearchParams(window.location.search);
+    const cpath = param.get('cp')||path;
+    let url = new URL(cpath, document.location.href);
+    $('section').load(url.pathname+'.htm'+url.search);
+}
+function getPages(page, total, listSize=10, pageSize=10) {
+    const max = Math.ceil(total/listSize);              //최대페이지
+    const mid = Math.floor(pageSize/2);                 //중간페이지
+    const size= pageSize>max ? max : pageSize;          //출력갯수
+    let sta = page > mid ? page-mid : 1;                //시작페이지
+    let end = sta+size;                                 //끝페이지
+    if(end > max) end=max;                              //최대초과시
+    if(end-sta<size) sta=end-size+1;                    //max가까운곳 처리   
+    return Array.from({length: size}, (_, i)=> sta+i);
+}
+
+$(document).ready(function(){
+    $.getJSON("menu.json", function(data) {
+        $('nav').loadTemplate(data.menu);
+        $('aside').loadTemplate(data.side);
+        $('footer').loadTemplate(data.foot);
+    }).fail(error=> {
+        console.log("MENU:"+error);
     });
+    loadContent('/book');
 });
+
 </script>
 </body>
 </html>

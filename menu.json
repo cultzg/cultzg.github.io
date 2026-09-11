@@ -1,0 +1,27 @@
+{
+"menu" : [
+    {"name":"미디어", "link":"/media/index"},
+    {"name": "인공지능", "link":"/ai/index"},
+    {"name":"정보캐기", "link":"/info/index"},
+    {"name":"API", "link":"/api/index"}
+],
+"side": [
+    {"name": "뽐뿌", "link": "https://www.ppomppu.co.kr/hot.php"},
+    {"name": "클리앙", "link": "https://www.clien.net/service/"},
+    {"name": "오유", "link": "https://www.todayhumor.co.kr/board/list.php?table=bestofbest"},
+    {"name": "홍차넷", "link": "https://redtea.kr/recommended"},
+    {"name": "레시피", "link": "https://www.10000recipe.com/recipe/list.html"},
+    {"name": "ChatGPT", "link": "https://chatgpt.com/"},
+    {"name": "Grok", "link": "https://grok.com/"},
+    {"name": "Gemini", "link": "https://gemini.google.com/app?hl=ko"},
+    {"name": "Etymology", "link": "https://www.etymonline.com/"},
+    {"name": "IP주소", "link": "https://www.geolocation.com/ko/"},
+    {"name": "DuckDNS", "link": "https://www.duckdns.org/domains"},
+    {"name": "HWP Viewer", "link": "https://allinpdf.com/kr/hwp-viewer"},
+    {"name": "Social Blade", "link": "https://socialblade.com/youtube/lists/top/50/subscribers/all/global"},
+    {"name": "Top 100 Sites", "link": "https://www.similarweb.com/top-websites/"}
+],
+"foot": [{
+    "1": "<a href='mailto:'>📧</a>"
+}]
+}

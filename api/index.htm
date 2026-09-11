@@ -1,0 +1,23 @@
+<H2>📃 API List</H2><hr>
+<div id="dataList" class="data"></div>
+<div id="pageList" class="page"></div>
+<!--<div id="dataForm"><button>추가</button></div>-->
+<script>
+function loadList(page) {
+    const listSize = 20;
+    const api = API+`/api?offsize=${(page-1)*listSize},${listSize}`;
+    $.get(api,(data)=>{
+        data.rows.map(row=>{
+            row['base_url']=`<a href="${row['base_url']}">${row['base_url']}</a>`;
+            delete row.created_at;
+        });
+        $('#dataList').loadTemplate(data.rows, 'table', '<td>{_val}</td>');
+        
+        const pages = getPages(page, data.total, listSize);
+        $('#pageList').loadTemplate(pages, 'ul', '<li><a href="javascript:loadList({_val})">{_val}</a></li>');
+        $('#pageList').find('li').eq(page-1).addClass('active');
+    });
+}
+loadList(1);
+//$('#dataForm').load('/form.htm?api=/api/form');
+</script>
