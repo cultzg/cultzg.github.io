@@ -1,0 +1,156 @@
+<h2>SRT 자막번역기</h2><hr>
+<input type="file" id="fileInput" style="width:85%">&nbsp;<button id="btnTrans" disabled>번역 시작</button><br>
+<textarea id="srt1" rows="20" style="width:50%"></textarea>
+<textarea id="srt2" rows="20" style="width:49%"></textarea><br>
+<div id="status" class="status">파일을 먼저 선택해주세요.</div>
+
+<div id="alert" class="modal-content">
+    <h3>{title}</h3><hr>
+    <p>{message}</p>
+    <button onclick="$('#_modal').hide()">닫기</button>
+</div>
+
+<script>
+
+let srtArray = []; // 자막 배열
+let dnName = 'translated.srt'; //결과 저장 파일명
+
+$('#fileInput').on('change', (evt) => {
+    const file = evt.target.files[0];
+    if (!file) return;
+    dnName = file.name.split('.')[0] + '-ko.srt';
+    const reader = new FileReader();
+    reader.readAsText(file, 'utf-8');
+    reader.onload = (e) => {
+        const srtText = e.target.result;
+        srtArray = parseSRT(srtText); 
+        srtArray[0] = {no:0, text:'Translated By AI'};      
+        $('#srt1').val(srtText);//JSON.stringify(srtArray, null, 2);
+        $('#btnTrans').prop('disabled', false);
+
+        $('#status').text('번역시작 버튼을 누르면 번역을 시작합니다.');
+        syncScroll($('#srt2'), $('#srt1'));
+    };
+});
+
+function syncScroll(source, target) {
+    source.on('scroll', () => {
+        if (target.scrollTop() !== source.scrollTop()) {
+            target.scrollTop(source.scrollTop());
+        }
+    });
+}
+
+function saveTextAsFile() {
+  const text = $('#srt2').val();
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = dnName; // 저장할 파일명
+  document.body.appendChild(a);
+  a.click();
+  
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// SRT 파일을 파싱하여 배열로 만드는 함수
+function parseSRT(data) {
+    // 줄바꿈 기준(\r\n 또는 \n)으로 텍스트를 나누고, 앞뒤 공백을 제거한 블록 단위로 분리합니다.
+    const blocks = data.replace(/\r\n/g, '\n').trim().split('\n\n');
+    const result = [];
+
+    blocks.forEach(block => {
+        const lines = block.split('\n');
+        
+        if (lines.length >= 3) {
+            // 1. 순번 추출 (첫 번째 줄)
+            const no = parseInt(lines[0].trim(), 10);
+            
+            // 2. 타임라인 제외 (두 번째 줄은 lines[1]에 해당하며 '-->' 가 포함되어 있음)
+            const time = lines[1];
+            // 3. 자막 텍스트 추출 (세 번째 줄부터 마지막 줄까지 합침)
+            const textLines = lines.slice(2);
+            const text = textLines.join('\n').trim();
+
+            const trans = '';
+
+            // 배열에 저장
+            result[no] = {no, time, text, trans};
+        }
+    });
+    return result;
+}
+
+// 2. 번역 버튼 클릭 이벤트
+$('#btnTrans').on('click', async () => {
+    if(srtArray.length === 0) return;
+    $('#btnTrans').prop('disabled',true);
+  
+    // 자막을 쪼개어 번역 요청 (크기는 자유롭게 조절 가능)
+    const chunkSize = 20;
+    const totalChunk = Math.ceil(srtArray.length/chunkSize);
+    for(let i=0; i<totalChunk; i++) {
+        $('#status').text(`번역 진행 중... (${i+1}번째/${totalChunk})`);        
+        let sta = i*chunkSize;
+        let end = (i+1)*chunkSize;
+
+        const textToTranslate = srtArray.slice(sta, end).map( (item, idx) => `${item.no}:${item.text||''}`).join('\n');
+        //console.log(textToTranslate);continue;
+        try {
+            const translatedText = await translate(textToTranslate);
+            const transArray = translatedText.split('\n');
+            transArray.forEach(line => {
+                const match = line.match(/^(\d+):\s*(.*)/);
+                const no = parseInt(match[1]);
+                if(no!==0) {
+                    srtArray[no]['trans'] = match[2];
+                    $('#srt2').val() += `${no}\n${srtArray[no]['time']}\n${match[2]}\n\n`;
+                }
+            });
+        } catch (error) {
+            $('#alert').modalTemplate({title:'',message:'번역 서버가 휴식중입니다.'});
+            $('#status').text("번역 서버가 휴식중입니다.");
+            //console.error("번역 실패:", error);
+            break;
+        }
+    }
+
+    $('#status').text("번역 작업이 종료되었습니다.");
+    $('#btnTrans').prop('disabled',false);
+});
+
+
+
+
+// Ollama API 비동기 통신 함수
+async function translate(text, model='exaone3.5') {
+    // 사용할 로컬 모델명을 입력하세요 (예: llama3, gemma2, mistral 등)
+    const MODEL_NAME = model; 
+    const prompt = `우수한 번역가로서 다음 제공된 자막 데이터를 한국어로 자연스럽게 번역해 주세요. 
+각 줄의 시작에 있는 숫자: 포맷은 그대로 유지하고 문장 내용만 번역하세요. 다른 설명이나 인사말은 일체 제외하고 오직 번역된 결과만 출력하세요.
+
+번역 대상 목록:
+${text}`;
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            model: MODEL_NAME,
+            prompt: prompt,
+            stream: false // 스트리밍 비활성화로 결과 한 번에 받기
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Ollama API 에러: ${response.statusText}`);
+    }
+
+    const resData = await response.json();
+    return resData.response.trim();
+}
+
+</script>

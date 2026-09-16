@@ -67,6 +67,39 @@ body {
     height:100%;
 }
 
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    border: 1px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+    justify-self: center;
+    align-items: baseline;
+}
+
+.modal-content {
+    display: none;
+    position:relative;
+    top:100px;
+    background-color: #0f172a;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    text-align: center;
+}
+
+.status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #334155;
+  min-height: 24px;
+}
 
 /**-- UI --**/
 label { display: block; margin-top: 14px; font-weight: 500; }
@@ -80,7 +113,6 @@ textarea, input {
   color: #f8fafc;
   padding: 12px 14px;
   margin-top: 8px;
-  font: inherit;
 }
 button {
   border: none;

@@ -103,9 +103,9 @@
 </div>
 <script>
 // 전역 변수: 대화 기록을 저장하여 맥락(Context)을 유지합니다. (필수!) 
-const model = 'exaone3.5';//['exaone3.5','gemma4','phi4-mini']; 
-const api_url = 'http://localhost:3000/ai/chat';
-
+const aiModel = 'exaone3.5';//['exaone3.5','gemma4','phi4-mini']; 
+const aiApi = 'http://localhost:11434/api/chat';
+let chatHistory = [];
 $('#message').on('keydown', function(evt){
     if(evt.key === 'Enter' && !evt.shiftKey) {
         evt.preventDefault();
@@ -130,8 +130,8 @@ function chat() {
     setLoadingState(true);
     chatHistory.push({ role: 'user', content: message });//대화 기록에 사용자 메시지 추가 
 
-    fetch_api(api_url, {
-        model: model, // 사용할 모델 이름 (예: llama3, gemma 등)
+    fetch_api(aiApi, {
+        model: aiModel, // 사용할 모델 이름 (예: llama3, gemma 등)
         messages: chatHistory,
         stream: true    // 스트리밍 활성화
     });

@@ -1,0 +1,224 @@
+<h2>📺 YouTube Playlist → M3U</h2><hr>
+<p>유튜브 데이터 API키를 넣고, 유튜브 재생목록 링크를 붙여 넣으세요.<br>
+재생목록을 M3U 파일로 변환합니다.</p>
+<form>
+<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;"></div>
+<label for="apiKey">유튜브 데이터 API 키 <a href="https://developers.google.com/youtube/v3/getting-started?hl=ko" target="_blank">❔</a></label>
+<input id="apiKey" type="password" placeholder="Youtube Data API Key" autocomplete="current-password"/>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;">
+<label for="playlistUrls" style="margin:0;">유튜브 재생목록 링크 (한줄에 한개씩)</label>
+<button id="btnMyPlaylist" class="secondary" type="button">내 재생목록</button>
+<input id="googleClientId" type="text" placeholder="Google OAuth Client ID" style="display:none;"/>
+</div>
+<textarea id="playlistUrls" placeholder="https://www.youtube.com/playlist?list=PLxxxx&#10;https://www.youtube.com/playlist?list=PLyyyy"></textarea>
+
+<div id="pickerPanel" class="panel" aria-live="polite">
+  <div class="muted">추가할 재생목록을 선택하세요.</div>
+  <div id="pickerList" class="picker-list"></div>
+  <div class="picker-actions">
+    <button id="btnAddSelected" class="primary" type="button">Add selected playlists</button>
+    <button id="btnCancelPicker" class="secondary" type="button">Cancel</button>
+  </div>
+</div>
+</form>
+
+<div class="actions">
+  <button id="btnBuild" class="primary">M3U 파일 생성</button>
+  <button id="btnClear" class="secondary">초기화</button>
+</div>
+
+<div id="status" class="status">준비.</div>
+<div id="results" class="results"></div>
+
+<style>
+p { line-height: 1.6; color: #cbd5e1; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+.results {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.result {
+  display:flex; align-items:center; justify-content:space-between;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #0b1220;
+}
+.panel {
+  margin-top: 16px;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 14px;
+  background: #0b1220;
+  display: none;
+}
+.picker-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 280px;
+  overflow: auto;
+}
+.picker-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #111827;
+}
+.picker-item input { margin-top: 3px; }
+.picker-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.muted { color: #94a3b8; font-size: 0.95rem; }
+code { background: #111827; padding: 2px 6px; border-radius: 6px; }
+</style>
+<script src="/_js/jquery.youtube.js"></script>
+<script>
+
+function setStatus(message, isError = false) {
+  $('#status').text(message).css('border-color', isError ? '#ef4444' : '#334155');
+}
+
+
+function downloadText(filename, content) {
+  const blob = new Blob([content], { type: 'application/x-mpegurl;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function hidePickerPanel() {
+  $('#pickerPanel').hide();;
+}
+
+function showPickerPanel() {
+  $('#pickerPanel').show();;
+}
+
+function renderPlaylistPicker() {
+  $('#pickerList').html('');
+  if (!$.youtube.googlePlaylists.length) {
+    const empty = $('<div>').addClass('muted').text('No playlists were found for this account.');
+    $('#pickerList').append(empty);
+    return;
+  }
+
+  $.youtube.googlePlaylists.forEach((playlist) => {
+    const label = $('<label>').addClass('picker-item');
+
+    const checkbox = $('<input type=checkbox>').val(playlist.id).prop('checked',true);
+
+    const content = $('<div>');
+    const title = $('<strong>').text(playlist.title);
+    content.append(title);
+
+    if (playlist.description) {
+      const desc = $('<div>').addClass('muted').text(playlist.description);
+      content.append(desc);
+    }
+
+    label.append(checkbox);
+    label.append(content);
+    $('#pickerList').append(label);
+  });
+}
+
+async function buildPlaylists() {
+  
+  const api_url = `${API_URL}/google/youtube/playlistItem`;
+
+  const urls = $('#playlistUrls').val().split(/\n+/).map((value) => value.trim()).filter(Boolean);
+  if (!urls.length) {
+    setStatus('유튜브 재생목록 링크를 입력하세요.', true);
+    return;
+  }
+  const apiKey = $('#apiKey').val().trim();
+  if (!apiKey) {
+    setStatus('유튜브 API키가 필요합니다.', true);
+    return;
+  }
+  $('#results').html('');
+  setStatus('재생목록 내용을 처리하고 있습니다.');
+
+  try {
+    const data = {apiKey, urls} 
+    const res = await fetch(api_url, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+    });
+    const items = await res.json();
+    console.log(items);
+    const m3u = $.youtube.createM3U('유튜브 재생목록', items);
+    downloadText(`playlist.m3u`, m3u);
+    const item = $('<div>').addClass('result').html(`<strong></strong><span class="muted">${items.length}개 목록 생성되었습니다.<code>.m3u</code></span>`);
+    $('#results').append(item);
+  } catch(err) {
+    setStatus(err.message || '오류가 발생했습니다.', true)
+  }
+}
+
+$('#btnMyPlaylist').on('mouseover', ()=>{
+  $('#googleClientId').show();
+});
+$('#btnMyPlaylist').on('click', async ()=> {
+  const clientId = $('#googleClientId').val().trim();
+  if (!clientId) {
+    setStatus('구글 OAuth client ID 를 입력하세요.', true);
+    return;
+  }
+
+  $.youtube.GoogleSignin(clientId, async function() {
+    await $.youtube.getMyPlaylists();
+    renderPlaylistPicker();
+    showPickerPanel();
+    setStatus('Select one or more playlists to add.');
+  });
+  
+});
+
+btnAddSelected.addEventListener('click', () => {
+  const selectedIds = Array.from($('#pickerList').find('input[type="checkbox"]:checked')).map((input) => input.value).filter(Boolean);
+
+  if (!selectedIds.length) {
+    setStatus('적어도 한개 이상의 재생목록을 선택하세요.', true);
+    return;
+  }
+
+  const urls = selectedIds.map((id) => `https://www.youtube.com/playlist?list=${id}`);
+  const existing = $('#playlistUrls').val().trim();
+  $('#playlistUrls').val( existing ? `${existing}\n${urls.join('\n')}` : urls.join('\n') );
+  hidePickerPanel();
+  setStatus(`Added ${selectedIds.length} playlist${selectedIds.length > 1 ? 's' : ''}.`);
+});
+
+btnCancelPicker.addEventListener('click', () => {
+  hidePickerPanel();
+  setStatus('Cancelled playlist selection.');
+});
+
+btnBuild.addEventListener('click', buildPlaylists);
+btnClear.addEventListener('click', () => {
+  $('#playlistUrls').val('');
+  $('#apiKey').val('');
+  $('#googleClientId').val('');
+  $('#results').html('');
+  $.youtube.googlePlaylists = [];
+  $.youtube.googleAccessToken = null;
+  hidePickerPanel();
+  setStatus('준비.');
+});
+</script>

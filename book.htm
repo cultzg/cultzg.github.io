@@ -1,156 +1,67 @@
-<h2>📑 북마크</h2>
-<hr>
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <h3>항목 추가</h3><hr>
-        <p>추가할 정보를 입력해주세요.</p>
-        종류
-        <select>
-            <option>북마크</option>
-            <option>폴더</option>
-        </select>
-        <input name="name" placeholder="이름">
-        <input name="link" placeholder="https://www.bookmark.org">
-        <button id="closeBtn">닫기</button>
-    </div>
+<h2>📑 북마크</h2><hr>
+<div id="bookmark"></div>
+<div id="add-book" class="modal-content">
+    <h3>항목 추가</h3><hr>
+    <p>추가할 정보를 입력해주세요.</p>
+    종류
+    <select>
+        <option>북마크</option>
+        <option>폴더</option>
+    </select>
+    <input name="name" placeholder="이름">
+    <input name="link" placeholder="https://www.bookmark.org">
+    <button onClick="$('#_modal').hide()">닫기</button>
 </div>
-<div id="bookmark-browser"></div>
+<a href="#" onClick="addBook()">+</a>
 <style>
-/* 평소에는 숨김 */
-.modal {
-    display: none; 
-    position: fixed;
-    z-index: 10;
-    left: 0;
-    top: 0;
-    border: 1px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
-    justify-content: center;
-    align-items: baseline;
-}
-
-/* 모달 박스 디자인 */
-.modal-content {
-    position:relative;
-    top:100px;
-    background-color: #0f172a;
-    padding: 20px;
-    border-radius: 8px;
-    width: 500px;
-    text-align: center;
-}
-.folder-tree { list-style-type: none; padding-left: 20px; }
-.folder-item { font-weight: bold; cursor: pointer; user-select: none; margin: 4px 0; }
-.folder-item::before { content: "📁 "; }
-.folder-item.open::before { content: "📂 "; }
-.bookmark-item { font-weight: normal; margin: 2px 0; }
-.bookmark-item a { text-decoration: none; color: #0066cc; }
-.bookmark-item a:hover { text-decoration: underline; }
-.nested { display: none; }
+.tree { padding-left: 20px; }
+.folder { font-weight: bold; cursor: pointer; user-select: none; margin: 4px 0; }
+.folder::before { content: "📁 "; }
+.folder.open::before { content: "📂 "; }
+.nested { display: block; }
 .active { display: block; }
 </style>
 <script>
 // 1. 북마크 데이터 구조 (JSON)
 const bookmarkData = 
 [
-    { name: "<img src='https://www.youtube.com/favicon.ico' width=16px;> 유튜브", type: "link", url: "https://youtube.com" },
-    { name: "<img src='https://www.naver.com/favicon.ico' width=16px;> 네이버", type: "link", url: "https://naver.com" },
-    { name: "<img src='https://drive.google.com/favicon.ico' width=16px;> 드라이브", type: "link", url: "https://drive.google.com" },
+    { name: "<img src='https://www.youtube.com/favicon.ico' width=16px;> 유튜브", type: "item", url: "https://youtube.com" },
+    { name: "<img src='https://www.naver.com/favicon.ico' width=16px;> 네이버", type: "item", url: "https://naver.com" },
+    { name: "<img src='https://drive.google.com/favicon.ico' width=16px;> 드라이브", type: "item", url: "https://drive.google.com" },
     {
-        name: "커뮤니티",
+        name: "미디어",
         type: "folder",
         children: [
-            { name: "네이버", type: "link", url: "https://naver.com" },
-            { name: "구글", type: "link", url: "https://google.com" }
+            { name: "유튜브 까기", type: "item", url: "/?cp=/media/ytube.htm" },
+            { name: "자막번역 ", type: "item", url: "/?cp=/media/srt.htm" }
         ]
     },
     {
         name: "인공지능",
         type: "folder",
         children: [
-            {
-                name: "JavaScript",
-                type: "folder",
-                children: [
-                    { name: "MDN Web Docs", type: "link", url: "https://mozilla.org" },
-                    { name: "모던 JS 튜토리얼", type: "link", url: "https://javascript.info" }
-                ]
-            },
-            { name: "GitHub", type: "link", url: "https://github.com" }
+            { name: "라마와 대화를", type: "item", url: "/?cp=/api/ollama" },
+            { name: "GPT와 대화를", type: "item", url: "https://chatgpt.com/" },
+            { name: "에미나이와 대화를", type: "item", url: "https://gemini.google.com/app?hl=ko" }
         ]
-    },
-    {
-        name: "미디어",
+    },{
+        name: "정보캐기",
         type: "folder",
         children: [
-            {name: "유튜브", type: "link", url: "https://youtube.com" }
+            { name: "쏘샬 탑100", type: "item", url: "https://socialblade.com/youtube/lists/top/100/subscribers/all/global"},
+            { name: "아이피 위치", type:"item", url:"https://www.geolocation.com/ko/"}
         ]
-    }  
+    },{
+        name: "커뮤니티",
+        type: "folder",
+        children: [
+            { name: "뽐뿌", type: "item", url: "https://www.ppomppu.co.kr/hot.php"}
+        ]
+    }
 ];
 
-// 2. 트리 구조를 생성하는 재귀 함수
-function createTree(data, parentElement) {
-    const ul = document.createElement('ul');
-    ul.classList.add('folder-tree');
-
-    data.forEach(item => {
-        const li = document.createElement('li');
-
-        if (item.type === 'folder') {
-            // 폴더 타이틀 생성
-            const folderSpan = document.createElement('span');
-            folderSpan.textContent = item.name;
-            folderSpan.classList.add('folder-item');
-            li.appendChild(folderSpan);
-
-            // 하위 요소를 담을 컨테이너 생성
-            const nestedUl = document.createElement('div');
-            nestedUl.classList.add('nested');
-            
-            // 재귀 호출: 하위 데이터 처리
-            createTree(item.children, nestedUl);
-            li.appendChild(nestedUl);
-
-            // 폴더 클릭 이벤트 (열고 닫기)
-            folderSpan.addEventListener('mouseover', (e) => {
-                e.stopPropagation(); // 이벤트 버블링 방지
-                folderSpan.classList.toggle('open');
-                nestedUl.classList.toggle('active');
-            });
-            folderSpan.addEventListener('click', (e) => {
-                modal.style.display = 'flex';
-                //alert('누르지좀 마');
-            });
-
-        } else if (item.type === 'link') {
-            // 링크 아이템 생성
-            li.classList.add('bookmark-item');
-            const a = document.createElement('a');
-            a.href = item.url;
-            a.target = "_blank";
-            a.innerHTML = `↳ ${item.name}`;
-            li.appendChild(a);
-        }
-
-        ul.appendChild(li);
-    });
-    parentElement.appendChild(ul);
+$('#bookmark').treeTaglet(bookmarkData, '<a href="{url}">↳ {name}</a>');
+function addBook() {
+    $('#add-book').modalTaglet({});
 }
-
-// 3. 실행
-const modal = document.getElementById('modal');
-// 닫기 버튼 클릭 시 모달 숨기기
-document.getElementById('closeBtn').addEventListener('click', () => {
-    modal.style.display = 'none';
-});
-// 모달 외부 배경 클릭 시 닫기
-window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-const container = document.getElementById('bookmark-browser');
-createTree(bookmarkData, container);
 </script>

@@ -1,9 +1,9 @@
 {
 "menu" : [
-    {"name":"미디어", "link":"/media/index"},
-    {"name": "인공지능", "link":"/ai/index"},
-    {"name":"정보캐기", "link":"/info/index"},
-    {"name":"API", "link":"/api/index"}
+    {"name":"미디어", "link":"/media/ytube"},
+    {"name": "공개정보", "link":"/api/api"},
+    {"name": "인공지능", "link":"/api/ollama"},
+    {"name":"정보캐기", "link":"/grab/index"}
 ],
 "side": [
     {"name": "뽐뿌", "link": "https://www.ppomppu.co.kr/hot.php"},

@@ -9,11 +9,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
-<title>::Oops!</title>
+<title>MeTube</title>
 <link rel="stylesheet" href="_css/index.css">
 <link rel="stylesheet" href="_css/layout.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="_js/jquery.template.js?"></script>
+<script src="_js/jquery.taglet.js?=2"></script>
 </head>
 <body>
 <header><h1><a href="/">HOME</a></h1></header>
@@ -27,22 +27,16 @@
 </aside>
 </main>
 <footer></footer>
-<template id="tmpl_section" slot="section">
-<tr>
-    <td>{id}</td>
-    <td>{title}</td>
-    <td>{body}</td>
-</tr>
-</template>
+<div id="_modal" class="modal"></div>
 <script>
-const API = 'http://localhost:3000';//http://cultz.duckdns.org/api
-
+const API_URL = document.location.host=='localhost' ? 'http://localhost:3000' : 'http://cultz.duckdns.org/api'
 
 function loadContent(path='/main') {
     const param = new URLSearchParams(window.location.search);
-    const cpath = param.get('cp')||path;
-    let url = new URL(cpath, document.location.href);
-    $('section').load(url.pathname+'.htm'+url.search);
+    let cp = (param.get('cp')||path).replace(/\.html?$/i, '');
+    const curl = new URL(cp=='/index' ? path : cp, document.location.href);
+    const time = Date.now();
+    $('section').load( curl.pathname + '.htm?' + curl.search + '&t=' + time);
 }
 function getPages(page, total, listSize=10, pageSize=10) {
     const max = Math.ceil(total/listSize);              //최대페이지
@@ -57,13 +51,20 @@ function getPages(page, total, listSize=10, pageSize=10) {
 
 $(document).ready(function(){
     $.getJSON("menu.json", function(data) {
-        $('nav').loadTemplate(data.menu);
-        $('aside').loadTemplate(data.side);
-        $('footer').loadTemplate(data.foot);
+        $('nav').loadTaglet(data.menu);
+        $('aside').loadTaglet(data.side);
+        $('footer').loadTaglet(data.foot);
     }).fail(error=> {
         console.log("MENU:"+error);
     });
     loadContent('/book');
+});
+
+
+window.addEventListener('click', (e) => {// 모달 외부 배경 클릭 시 닫기
+    if ($(e.target) === $('#_modal')) {
+        $('#_modal').hide();
+    }
 });
 
 </script>
