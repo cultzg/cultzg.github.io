@@ -1,0 +1,36 @@
+[
+    { "name": "<img src='https://www.youtube.com/favicon.ico' width=16px;> 유튜브", "type": "item", "url": "https://youtube.com" },
+    { "name": "<img src='https://www.naver.com/favicon.ico' width=16px;> 네이버", "type": "item", "url": "https://naver.com" },
+    { "name": "<img src='https://drive.google.com/favicon.ico' width=16px;> 드라이브", "type": "item", "url": "https://drive.google.com" },
+    {
+        "name": "미디어",
+        "type": "folder",
+        "children": [
+            { "name": "유튜브 까기", "type": "item", "url": "/?cp=/media/ytube.htm" },
+            { "name": "자막번역 ", "type": "item", "url": "/?cp=/media/trans.htm" }
+        ]
+    },
+    {
+        "name": "인공지능",
+        "type": "folder",
+        "children": [
+            { "name": "라마와 대화를", "type": "item", "url": "/?cp=/api/ollama" },
+            { "name": "GPT와 대화를", "type": "item", "url": "https://chatgpt.com/" },
+            { "name": "에미나이와 대화를", "type": "item", "url": "https://gemini.google.com/app?hl=ko" }
+        ]
+    },{
+        "name": "정보캐기",
+        "type": "folder",
+        "children": [
+            { "name": "쏘샬 탑100", "type": "item", "url": "https://socialblade.com/youtube/lists/top/100/subscribers/all/global"},
+            { "name": "아이피 위치", "type":"item", "url":"https://www.geolocation.com/ko/"},
+            { "name": "API 입력", "type":"item", "url": "/?cp=/api/form"}
+        ]
+    },{
+        "name": "커뮤니티",
+        "type": "folder",
+        "children": [
+            { "name": "뽐뿌", "type": "item", "url": "https://www.ppomppu.co.kr/hot.php"}
+        ]
+    }
+]

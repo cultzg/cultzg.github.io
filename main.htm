@@ -1,6 +1,12 @@
-<h1>Hwllo</h1><hr>
+<h1>Hello</h1><hr>
+<template id="ui-data">
+    <tr>
+        <td>{id}</td>
+        <td>{title}</td>
+    </tr>
+</template>
 <script>
-// $.get('https://jsonplaceholder.typicode.com/posts', function(rows){
-//     $('#tmpl_section').loadTemplate(rows,'table');
-// });
+$.get('https://jsonplaceholder.typicode.com/posts', function(rows){
+    $('section').loadTaglet(rows, $('#ui-data').html(),'table');
+});
 </script>

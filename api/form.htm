@@ -1,0 +1,95 @@
+<h2>✍️ 입력 양식</h2><hr>
+<form id="userForm">
+  <div id="fields"></div>
+  <div class="flex right">
+    <button type="submit">저장</button>
+  </div>
+</form>
+<div id="status" class="ui-status">양식을 불러오는 중입니다...</div>
+
+<script>
+const form_url = 'http://localhost:3000/api/form'; //조회
+const post_url = 'http://localhost:3000/api';     //저장
+
+$(function () {
+
+	const $fields = $('#fields');
+	const $status = $('#status');
+
+	function getInputType(col) {
+		const type = (col.type || '').toUpperCase();
+		if (['INT','BIGINT','DECIMAL','FLOAT','DOUBLE'].includes(type)) return 'number';
+		if (['DATE','TIME','DATETIME'].includes(type)) return 'datetime-local';
+		if (['BOOL'].includes(type)) return 'checkbox';
+		return 'text';
+	}
+
+	function createField(col) {
+		const isAI = Boolean(col.ai);
+		const isPK = Boolean(col.pk || col.primaryKey);
+		const isNN = col.notnull && !isAI && !isPK;
+		const type = getInputType(col);
+
+		if(isAI) return;
+		const $wrap = $('<div class="field"></div>');
+		const $label = $('<label></label>').text(`${col.name}  ${isNN ? '*' : ''}`);
+		const $helper = $('<div class="helper"></div>');
+
+		let $input;
+		if (type === 'checkbox') {
+		$input = $('<input type="checkbox">').prop('checked', col.default ? true : false);
+		} else if (type === 'datetime-local') {
+		$input = $('<input type="text">');
+		} else {
+		$input = $('<input>').attr('type', type);
+		}
+
+		$input.attr('name', col.name);
+		$input.attr('id', 'field-' + col.name);
+		if (isNN) $input.attr('required', 'required');
+		if (isAI) $input.attr('disabled', 'disabled');
+		if (col.default !== null && col.default !== undefined && col.default !== '' && type !== 'checked' && type !== 'datetime-local') $input.val(col.default);
+		if (type=='datetime-local') $input.val(Date.now().toString());
+		if (col.value !== null) $input.val(col.value); //수정모드일때 값이 있음
+
+		return $wrap.append($label).append($input);
+	}
+
+  	//폼 생성
+	$.getJSON(form_url,function(cols) {
+		$fields.empty();
+		if (cols?.length==0) return $status.text('표시할 컬럼 정보가 없습니다.')
+		cols.map(col=>$fields.append(createField(col)));
+		$status.text('양식을 생성했습니다.');
+	}).fail(function () {
+		$status.text('양식 정보를 불러오지 못했습니다.');
+	});
+
+  	//폼 제출
+	$('#userForm').on('submit', function (e) {
+		e.preventDefault();
+		
+		const formData = {};
+		$(this).serializeArray().forEach(function (item) {
+			formData[item.name] = item.value;
+		});
+		$('input[type="checkbox"]', this).each(function () {
+			formData[$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
+		});
+
+		$status.text('저장 요청 중...');
+		$.ajax({
+			url: post_url,
+			type: 'POST'||'PUT',
+			contentType: 'application/json',
+			data: JSON.stringify(formData),
+			success: function (response) {
+				$status.text('저장 성공: ' + JSON.stringify(response, null, 2));
+			}, error: function (xhr) {
+				const msg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : '저장 실패';
+				$status.text(msg);
+			}
+		});
+  	});
+});
+</script>

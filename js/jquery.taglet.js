@@ -1,10 +1,12 @@
 (function($){
 
     $.taglet = {
-        th: '<th>{_key}</th>',
-        td: '<td>{_val}</td>',
-        li: '<li>{_val}</li>',
-        div:'<div>{_val}</div>',
+        df: {
+            th: '<th>{_key}</th>',
+            td: '<td>{_val}</td>',
+            li: '<li>{_val}</li>',
+            div:'<div>{_val}</div>',
+        },
         bind: function(data, text, tag=''){ //2차원 객체 배열처리
             if(Array.isArray(data)) {
                 return data.map(row => tag + $.taglet.bind(row, text)).join('');
@@ -19,21 +21,20 @@
             }
         }
     }
-
-    $.fn.loadTaglet = function(rows=[], tag='ul', tmpl='' ) {
+    $.fn.loadTaglet = function(rows, tmpl, tag='ul' ) {
         let html = '';
         const text = tmpl||$(this).html();
         const slot = $(this).prop('slot')||this;
         
         if(tag==='table') {
-            const th = $.taglet.bind(rows[0], $.taglet.th, '<tr>');
-            const tr = $.taglet.bind(rows, text||$.taglet.td,'<tr>');
+            const th = $.taglet.bind(rows[0], text.replace(/[\{\}]/g,'').replaceAll('<td','<th')||$.taglet.df.th, '<tr>');
+            const tr = $.taglet.bind(rows, text||$.taglet.df.td,'<tr>');
             html = $(`<${tag}>`).append(th).append(tr);
         } else if(tag==='ul') {
-            const li = $.taglet.bind(rows, text||$.taglet.li);
+            const li = $.taglet.bind(rows, text||$.taglet.df.li);
             html = $(`<${tag}>`).append(li);
         } else {
-            const div = $.taglet.bind(rows, text||$.taglet.div);
+            const div = $.taglet.bind(rows, text||$.taglet.df.div);
             html = $(`<${tag}>`).append(div);
         }              
         return $(slot).html(html);
@@ -69,8 +70,11 @@
     $.fn.modalTaglet = function(row) {
         const html = $(this).prop('outerHTML');
         const tmpl = $.taglet.bind(row, html);
-        $('#_modal').html(tmpl);
-        $('#_modal .modal-content').show();
-        $('#_modal').show();
+        $('#modal').html(tmpl);
+        const button = $('<button onClick=$("#modal").hide()>닫기</button>').addClass('center');
+        const div = $('<div>').addClass('flex center').append(button);
+        $('#modal div.ui-modal-content').append(div);
+        $('#modal .ui-modal-content').show();
+        $('#modal').css('display','flex');
     }
 }(jQuery));

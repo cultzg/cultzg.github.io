@@ -24,6 +24,13 @@ header {
 main {
     width:100%;
 }
+nav, section, aside, footer {
+    padding:1em;
+}
+footer {
+    clear:both;
+    text-align:center;
+}
 section {
     width: 100%; 
     min-width: 800px;
@@ -33,13 +40,6 @@ section {
     border-radius: 20px;
     padding: 24px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-}
-nav, section, aside, footer {
-    padding:1em;
-}
-footer {
-    clear:both;
-    text-align:center;
 }
 
 @-ms-viewport {
@@ -94,4 +94,75 @@ footer {
     aside li {
         line-height:1.5em;
     }
+}
+
+
+/* ui-common */
+.ui-data table {
+    width:100%;
+}
+.ui-data th {
+    height:2em;
+    background-color: #16233f;
+}
+.ui-data tr:nth-child(odd) {
+    height:2em;
+    background-color: #1b2a4b;
+}
+/* 짝수 번째 tr 배경색 */
+.ui-data tr:nth-child(even) {
+    height:2em;
+    background-color: #233150;
+}
+
+.ui-page ul {
+    width:50%;
+    display:flex;
+    justify-content: space-evenly;
+}
+.ui-page li {
+    border: 1px solid #334155;border: 1px solid #334155;
+}
+.ui-page li.active {
+    background-color:#e2e8f0;
+}
+.ui-page li a {
+    display:block;
+    padding:0.8em;
+    width:100%;
+    height:100%;
+}
+
+.ui-modal {
+    display: none; 
+    justify-content: center;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    border: 1px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+    align-items: baseline;
+}
+
+.ui-modal-content {
+    display: none;
+    position:relative;
+    top:100px;
+    background-color: #0f172a;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    text-align: center;
+}
+
+.ui-status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #334155;
+  min-height: 24px;
 }

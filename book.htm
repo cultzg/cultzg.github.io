@@ -1,18 +1,3 @@
-<h2>📑 북마크</h2><hr>
-<div id="bookmark"></div>
-<div id="add-book" class="modal-content">
-    <h3>항목 추가</h3><hr>
-    <p>추가할 정보를 입력해주세요.</p>
-    종류
-    <select>
-        <option>북마크</option>
-        <option>폴더</option>
-    </select>
-    <input name="name" placeholder="이름">
-    <input name="link" placeholder="https://www.bookmark.org">
-    <button onClick="$('#_modal').hide()">닫기</button>
-</div>
-<a href="#" onClick="addBook()">+</a>
 <style>
 .tree { padding-left: 20px; }
 .folder { font-weight: bold; cursor: pointer; user-select: none; margin: 4px 0; }
@@ -21,47 +6,25 @@
 .nested { display: block; }
 .active { display: block; }
 </style>
-<script>
-// 1. 북마크 데이터 구조 (JSON)
-const bookmarkData = 
-[
-    { name: "<img src='https://www.youtube.com/favicon.ico' width=16px;> 유튜브", type: "item", url: "https://youtube.com" },
-    { name: "<img src='https://www.naver.com/favicon.ico' width=16px;> 네이버", type: "item", url: "https://naver.com" },
-    { name: "<img src='https://drive.google.com/favicon.ico' width=16px;> 드라이브", type: "item", url: "https://drive.google.com" },
-    {
-        name: "미디어",
-        type: "folder",
-        children: [
-            { name: "유튜브 까기", type: "item", url: "/?cp=/media/ytube.htm" },
-            { name: "자막번역 ", type: "item", url: "/?cp=/media/srt.htm" }
-        ]
-    },
-    {
-        name: "인공지능",
-        type: "folder",
-        children: [
-            { name: "라마와 대화를", type: "item", url: "/?cp=/api/ollama" },
-            { name: "GPT와 대화를", type: "item", url: "https://chatgpt.com/" },
-            { name: "에미나이와 대화를", type: "item", url: "https://gemini.google.com/app?hl=ko" }
-        ]
-    },{
-        name: "정보캐기",
-        type: "folder",
-        children: [
-            { name: "쏘샬 탑100", type: "item", url: "https://socialblade.com/youtube/lists/top/100/subscribers/all/global"},
-            { name: "아이피 위치", type:"item", url:"https://www.geolocation.com/ko/"}
-        ]
-    },{
-        name: "커뮤니티",
-        type: "folder",
-        children: [
-            { name: "뽐뿌", type: "item", url: "https://www.ppomppu.co.kr/hot.php"}
-        ]
-    }
-];
+<!-- 목록 -->
+<h2>📑 북마크</h2><hr>
+<div id="bookmark"></div>
+<div class="flex right"><button onClick="$('#add-book').modalTaglet({})">추가</button></div>
 
-$('#bookmark').treeTaglet(bookmarkData, '<a href="{url}">↳ {name}</a>');
-function addBook() {
-    $('#add-book').modalTaglet({});
-}
+<!--항목 추가-->
+<div id="add-book" class="ui-modal-content">
+    <h3>📝 항목 추가</h3><hr>
+    <p>추가할 정보를 입력해주세요.</p>
+    종류
+    <select>
+        <option>북마크</option>
+        <option>폴더</option>
+    </select>
+    <input name="name" placeholder="이름">
+    <input name="link" placeholder="https://www.bookmark.org">
+</div>
+<script>
+$.getJSON("book.json", function(bookmarkData) {
+    $('#bookmark').treeTaglet(bookmarkData, '<a href="{url}">↳ {name}</a>');
+});
 </script>

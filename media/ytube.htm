@@ -1,37 +1,3 @@
-<h2>📺 YouTube Playlist → M3U</h2><hr>
-<p>유튜브 데이터 API키를 넣고, 유튜브 재생목록 링크를 붙여 넣으세요.<br>
-재생목록을 M3U 파일로 변환합니다.</p>
-<form>
-<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;"></div>
-<label for="apiKey">유튜브 데이터 API 키 <a href="https://developers.google.com/youtube/v3/getting-started?hl=ko" target="_blank">❔</a></label>
-<input id="apiKey" type="password" placeholder="Youtube Data API Key" autocomplete="current-password"/>
-</div>
-
-<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;">
-<label for="playlistUrls" style="margin:0;">유튜브 재생목록 링크 (한줄에 한개씩)</label>
-<button id="btnMyPlaylist" class="secondary" type="button">내 재생목록</button>
-<input id="googleClientId" type="text" placeholder="Google OAuth Client ID" style="display:none;"/>
-</div>
-<textarea id="playlistUrls" placeholder="https://www.youtube.com/playlist?list=PLxxxx&#10;https://www.youtube.com/playlist?list=PLyyyy"></textarea>
-
-<div id="pickerPanel" class="panel" aria-live="polite">
-  <div class="muted">추가할 재생목록을 선택하세요.</div>
-  <div id="pickerList" class="picker-list"></div>
-  <div class="picker-actions">
-    <button id="btnAddSelected" class="primary" type="button">Add selected playlists</button>
-    <button id="btnCancelPicker" class="secondary" type="button">Cancel</button>
-  </div>
-</div>
-</form>
-
-<div class="actions">
-  <button id="btnBuild" class="primary">M3U 파일 생성</button>
-  <button id="btnClear" class="secondary">초기화</button>
-</div>
-
-<div id="status" class="status">준비.</div>
-<div id="results" class="results"></div>
-
 <style>
 p { line-height: 1.6; color: #cbd5e1; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
@@ -82,9 +48,43 @@ p { line-height: 1.6; color: #cbd5e1; }
 .muted { color: #94a3b8; font-size: 0.95rem; }
 code { background: #111827; padding: 2px 6px; border-radius: 6px; }
 </style>
-<script src="/_js/jquery.youtube.js"></script>
-<script>
 
+<h2>📺 Youtube Playlist → M3U</h2><hr>
+<p>유튜브 데이터 API키를 넣고, 유튜브 재생목록 링크를 붙여 넣으세요.<br>
+재생목록을 M3U 파일로 변환합니다.</p>
+<form>
+<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;"></div>
+<label for="apiKey">유튜브 데이터 API 키 <a href="https://developers.google.com/youtube/v3/getting-started?hl=ko" target="_blank">❔</a></label>
+<input id="apiKey" type="password" placeholder="Youtube Data API Key" autocomplete="current-password"/>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;">
+<label for="playlistUrls" style="margin:0;">유튜브 재생목록 링크 (한줄에 한개씩)</label>
+<button id="btnMyPlaylist" class="secondary" type="button">내 재생목록</button>
+<input id="googleClientId" type="text" placeholder="Google OAuth Client ID" style="display:none;"/>
+</div>
+<textarea id="playlistUrls" placeholder="https://www.youtube.com/playlist?list=PLxxxx&#10;https://www.youtube.com/playlist?list=PLyyyy"></textarea>
+
+<div id="pickerPanel" class="panel" aria-live="polite">
+  <div class="muted">추가할 재생목록을 선택하세요.</div>
+  <div id="pickerList" class="picker-list"></div>
+  <div class="picker-actions">
+    <button id="btnAddSelected" class="primary" type="button">Add selected playlists</button>
+    <button id="btnCancelPicker" class="secondary" type="button">Cancel</button>
+  </div>
+</div>
+</form>
+
+<div class="actions flex right">
+  <button id="btnBuild" class="primary">M3U 파일 생성</button>
+  <button id="btnClear" class="secondary">초기화</button>
+</div>
+
+<div id="status" class="ui-status">준비.</div>
+<div id="results" class="results"></div>
+
+<script>
+$.getScript('/js/jquery.youtube.js');
 function setStatus(message, isError = false) {
   $('#status').text(message).css('border-color', isError ? '#ef4444' : '#334155');
 }
