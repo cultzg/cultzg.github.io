@@ -1,8 +1,10 @@
-const current = Date.now();
-/***
- * Head 추가
- */
+(function() {
+    const current = Date.now();
+    /***
+     * Head 추가
+     */
 
+<<<<<<< HEAD
 const meta = `
 <meta charset="utf-8">
 <meta http-equiv="no-cache">
@@ -14,23 +16,40 @@ const meta = `
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">`;
 const cstyle = [];
 const script = ['jquery.min.js'];
+=======
+    const meta = `
+    <meta charset="utf-8">
+    <meta http-equiv="no-cache">
+    <meta http-equiv="Pragma: no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatable" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">`;
+    const cstyle = [];
+    const script = ['jquery.min.js'];
+>>>>>>> f88b488 (v1.0.2)
 
-const head = document.getElementsByTagName('head')[0];
-head.prepend(document.createRange().createContextualFragment(meta));
-script.forEach(js=>{
-    const script = document.createElement('script');
-    script.type='text/javascript'
-    script.src = `/js/${js}?t=${current}`;
-    head.appendChild(script);    
-})
-cstyle.forEach(css=>{
-    const cstyle = document.createElement('link');
-    cstyle.type = 'text/css';
-    cstyle.rel = 'stylesheet'; 
-    cstyle.href = `/css/${css}?t=${current}`;
-    head.appendChild(cstyle);
+    const head = document.getElementsByTagName('head')[0];
+    head.prepend(document.createRange().createContextualFragment(meta));
+    script.forEach(js=>{
+        const script = document.createElement('script');
+        script.type='text/javascript'
+        script.src = `/js/${js}?t=${current}`;
+        head.appendChild(script);    
+    })
+    cstyle.forEach(css=>{
+        const cstyle = document.createElement('link');
+        cstyle.type = 'text/css';
+        cstyle.rel = 'stylesheet'; 
+        cstyle.href = `/css/${css}?t=${current}`;
+        head.appendChild(cstyle);
+    });
 });
 
+//** Variable */
+//const apis = document.location.hostname=='localhost' ?  'http://localhost:3000' : 'http://cultzg.duckdns.org/api';
+const apis = 'http://localhost:3000;'
 
 
 /****
@@ -40,8 +59,7 @@ function getPage(path='/main') { //서브페이지
     const param = new URLSearchParams(window.location.search);
     let cp = (param.get('cp')||path).replace(/\.html?$/i, '');
     const curl = new URL(cp=='/index' ? path : cp, document.location.href);
-    const time = Date.now();
-    $('section').load( curl.pathname + '.htm?' + curl.search + '&t=' + time);
+    $('section').load( curl.pathname + '.htm?' + curl.search + '&t=' + Date.now());
 }
 
 function setCommonUI() { //모달 창

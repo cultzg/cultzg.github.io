@@ -1,0 +1,32 @@
+# OpenAI GPTBot 차단 (ChatGPT 학습 데이터 수집 거부)
+User-agent: GPTBot
+Disallow: /
+
+# xAI GrokBot 차단 (Grok 학습 데이터 수집 거부)
+User-agent: grokbot
+Disallow: /
+
+# Meta(Facebook) 크롤러 차단 (Meta AI 및 페이스북 크롤러 거부)
+User-agent: FacebookBot
+Disallow: /
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+# Claud
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-SearchBot
+Disallow: /
+
+User-agent: Claude-User
+Disallow: /
+
+# Google
+User-agent: Google-Extended
+Disallow: /
+
+#
+User-agent: OAI-SearchBot
+Disallow: /
+
