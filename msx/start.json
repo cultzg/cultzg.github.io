@@ -1,7 +1,7 @@
 {
     "name": "GitHub Pages Example",
     "version": "1.0.3",
-    "parameter": "menu:http://localhost/data/menu.json",
+    "parameter": "menu:https://localhost/msx/menu.json",
     "launcher": {
         "icon": "pages"
     }
