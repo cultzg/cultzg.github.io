@@ -44,6 +44,8 @@ function getPage(path='/main') { //서브페이지
 }
 
 function setCommonUI() { //모달 창
+    let log = '/log.htm';
+    if(document.referer.include(log)) window.location.href=log;
     const modal = $('<div>').prop('id','modal').addClass('ui-modal');
     $(document.body).append(modal);
     $(document.body).on('click', evt => {
