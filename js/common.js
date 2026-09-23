@@ -28,10 +28,9 @@ cstyle.forEach(css=>{
     head.appendChild(cstyle);
 });
 
-
 //** Variable */
 //const apis = document.location.hostname=='localhost' ?  'http://localhost:3000' : 'http://cultzg.duckdns.org/api';
-const apis = 'http://localhost:3000;'
+const apis = 'http://localhost:3000';
 
 
 /****

@@ -25,6 +25,7 @@
             { "name": "쏘샬 탑100", "type": "item", "url": "https://socialblade.com/youtube/lists/top/100/subscribers/all/global"},
             { "name": "아이피 위치", "type":"item", "url":"https://www.geolocation.com/ko/"},
             { "name": "API 입력", "type":"item", "url": "/?cp=/api/form"}
+            { "name": "오픈 API", "type":"item", "url": "/?cp=/api/openapi"}
         ]
     },{
         "name": "커뮤니티",

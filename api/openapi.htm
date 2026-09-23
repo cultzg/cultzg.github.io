@@ -1,0 +1,160 @@
+<h2>✍️ 입력 양식</h2><hr>
+<form id="userForm">
+<table width="100%">
+	<tr>
+		<td width="50%"><div id="fields"></div></td>
+		<td width="50%"><iframe id="logFrame"></iframe></td>
+	</tr>
+</table>
+  <div class="flex right">
+    <button type="submit">저장</button>
+  </div>
+</form>
+<div id="status" class="ui-status">양식을 불러오는 중입니다...</div>
+<style>
+iframe {width:100%; height:500px;}
+.field {width:100%; display:flex; justify-content: space-between;align-items: center;}
+label {
+	width:100px;
+}
+input {
+	width:200px;
+}
+</style>
+<script>
+const form_url = `${apis}/openapi/endpoint/1`; //조회
+var post_url = `${apis}/api`;     //저장
+var post_method = 'GET';
+
+
+$(function () {
+
+    const $fields = $('#fields');
+	const $status = $('#status');
+    let $params;
+
+    function getInputType(param) {
+		const type = (param.type || '').toUpperCase();
+		if (['INT','NUM','FLOAT'].includes(type)) return 'number';
+		if (['DATE','TIME','DATETIME'].includes(type)) return 'datetime-local';
+		if (['BOOL'].includes(type)) return 'checkbox';
+		return 'text';
+	}
+
+    function createField(param) {
+		const isNN = param.require;
+		const type = getInputType(param);
+
+		const $wrap = $('<div class="field"></div>');
+		const $label = $('<div></div>').text(`${param.name}  ${isNN ? '*' : ''}`);
+		const $helper = $('<div class="helper"></div>');
+
+		let $input;
+		if (type === 'checkbox') {
+		    $input = $('<input type="checkbox">').prop('checked', col.default ? true : false);
+		} else if (type === 'datetime-local') {
+		    $input = $('<input type="text">');
+		} else {
+		    $input = $('<input>').attr('type', type);
+		}
+
+		$input.attr('name', param.name);
+		$input.attr('id', 'field-' + param.name);
+		if (isNN) $input.attr('required', 'required');
+		if (param.default !== null && param.default !== undefined && param.default !== '' && type !== 'checked' && type !== 'datetime-local') $input.val(param.default);
+		if (type=='datetime-local') $input.val(Date.now().toString());
+
+		return $wrap.append($label).append($input);
+	}
+
+    //폼 생성
+    $.getJSON(form_url,function(res) {
+        $fields.empty();
+        if (res?.length==0) return $status.text('표시할 컬럼 정보가 없습니다.')
+        //console.log(res);
+		
+		post_url = res.api.url + res.endpoint.path;
+		post_method = res.endpoint.method;
+
+		if(res.api.desc_url) {
+			$('h2').append(`<span><a href="${res.api.desc_url}" target=_blank>❓</a></span>`)
+		}
+		params = res.params.rows;
+        res.params.rows.map(param=>$fields.append(createField(param)));
+
+        $status.text('양식을 생성했습니다.');
+    }).fail(function () {
+        $status.text('양식 정보를 불러오지 못했습니다.');
+    });
+
+	//폼 제출
+	$('#userForm').on('submit', function (e) {
+		e.preventDefault();
+		
+		const formData = {};
+		$(this).serializeArray().forEach(function (item) {
+			formData[item.name] = item.value;
+		});
+		$('input[type="checkbox"]', this).each(function () {
+			formData[$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
+		});
+
+		splitData = {path:[],query:[],header:{},body:{}}
+		params.forEach(param=>{
+            const val = {}
+            const loc = param.loc;
+            const name = param.name;
+
+            if(formData[name]) {
+                if(loc=='query'||loc=='path') {
+                    splitData[loc].push([name, formData[name]]);
+                } else {
+                    splitData[loc][name] = formData[name]; 
+                }
+            }
+        });
+
+        const query=new URLSearchParams(splitData.query).toString();
+		const request_url = `${post_url}?${query}`;
+		const req = {
+            method: post_method,
+            headers: {contentType: 'application/json', ...splitData.header}
+        };
+		if(post_method=='POST'||post_method=='PUT')
+			req['body'] = JSON.stringify(splitData.body);
+		console.log(request_url, req);
+
+		$status.text('요청 중...');
+		const response = fetch(request_url, req)
+		 	.then(res=>res.json())
+		 	.then(json=>{return json})
+		 	.catch(err=>console.error(err));
+		console.log(response);
+  	});
+
+	function name() {
+		params.forEach(param=>{
+            const val = {}
+            const loc = param.loc;
+            const name = param.name;
+            if(param.default) { //기본값 가져오기
+                const key = /\{([^}]+)\}/g.exec(param.default)[1];
+                if(key) param.default = api[key];
+            }
+            if(req.body[name]) {
+                if(loc=='query'||loc=='path') {
+                    result[loc].push([name, param.default||req.body[name]]);
+                } else {
+                    result[loc][name] = param.default||req.body[name]; 
+                }
+            }
+        });
+        console.log(result);
+        const url = api.url + endpoint.path + result.path.join('/');
+        const method = endpoint.method;
+        const query=new URLSearchParams(result.query).toString();
+        const header=result.header;
+        const body=result.body;
+	}
+
+});

@@ -68,3 +68,5 @@ div.flex.right {
 button:hover { transform: translateY(-1px); }
 button.primary { background: #38bdf8; color: #082f49; }
 button.secondary { background: #1e293b; color: #f8fafc; }
+
+.hide {display: none;}

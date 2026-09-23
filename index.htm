@@ -2,9 +2,10 @@
 <html lang="ko-KR">
 <head>
 <title>^^;</title>
-<script src="/js/common.js"></script>
+<script src="/js/common.js?t=1"></script>
 </head>
 <body>
+<a href=/.log.htm class="hide">Go</a>
 <header><h1><a href="/">HOME</a></h1></header>
 <main>
 <nav class="menu"></nav>
@@ -24,6 +25,8 @@
 </template>
 <script>
 window.onload = function(){
+    let log = '/.log.htm';
+    if(document.referer.include(log)) window.location.href=log;
     $.getScript('/js/jquery.taglet.js')
         .done(function(){
             setCommonUI();
@@ -34,7 +37,7 @@ window.onload = function(){
                 //$('footer').loadTaglet(data.foot);
             });
             getPage('/book');
-        })
+    })
 }
 </script>
 </body>
